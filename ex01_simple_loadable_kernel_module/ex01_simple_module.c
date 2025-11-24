@@ -2,16 +2,14 @@
 #include <linux/module.h>
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Your Name");
-MODULE_DESCRIPTION("Simple example kernel module");
 
-int ex01_simple_module_init(void)
+static int ex01_simple_module_init(void)
 {
     printk(KERN_ALERT "Inside the %s function\n", __FUNCTION__);
     return 0;
 }
 
-void ex01_simple_module_exit(void)
+static void ex01_simple_module_exit(void)
 {
     printk(KERN_ALERT "Inside the %s function\n", __FUNCTION__);
 }

@@ -51,8 +51,8 @@ MODULE_AUTHOR("Your Name");
 MODULE_DESCRIPTION("Simple example kernel module");
 ```
 ```
-$ make -C /lib/modules/$(uname -r)/build M=$PWD clean
-$ make -C /lib/modules/$(uname -r)/build M=$PWD modules
+$ make clean
+$ make
 ```
 
 # load the module
@@ -77,3 +77,15 @@ And you will see
 Nov 21 17:42:47 whoyouhow-VirtualBox kernel: [ 3288.336174] Inside the ex01_simple_module_init function
 Nov 21 17:44:10 whoyouhow-VirtualBox kernel: [ 3371.596083] Inside the ex01_simple_module_exit function
 ```
+
+Question : why __init & __initdata token not really decrease the kernel size when loading module?
+
+Ans : 
+These token will really decrease kernel size when the module is built-in module (built in vmlinux), when kernel finish all initialization when booting, kernel will call free_initmem() to free all init section.
+
+ref : https://kernelnewbies.org/FAQ/InitExitMacros?utm_source=chatgpt.com
+
+But for loadable module (.ko), kernel will not free the module .init section.
+So __init in the module still exist in the memory of module.
+
+ref : https://stackoverflow.com/questions/11680641/init-and-exit-macros-usage-for-built-in-and-loadable-modules
