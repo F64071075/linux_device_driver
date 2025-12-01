@@ -7,8 +7,9 @@ ifneq ($(KERNELRELEASE),)
 	obj-m += ex0203_simple_module.o
 	ex0203_simple_module-objs := ex02_simple_module_init.o ex03_simple_module_exit.o 
 	obj-m += ex04_simple_module__init_token.o
-  obj-m += ex05_exporting_symbols.o
-  obj-m += ex05_using_symbols.o
+  	obj-m += ex05_exporting_symbols.o
+  	obj-m += ex05_using_symbols.o
+	obj-m += ex06_module_param.o
   
 # Otherwise we were called directly from the command
 # line; invoke the kernel build system.

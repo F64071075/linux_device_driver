@@ -101,14 +101,13 @@ Usage :
 ## If insmod a module that needs some symbols kernel don't has, you cannot  insert module
 ```
 $ sudo insmod ./ex05_using_symbols.ko
-```
 insmod: ERROR: could not insert module ./ex05_using_symbols.ko: Unknown symbol in module
 ```
-$ sudo dmesg
 ```
+$ sudo dmesg
 [ 1102.706836] ex05_using_symbols: loading out-of-tree module taints kernel.
-
 [ 1102.706895] ex05_using_symbols: Unknown symbol ex05_simple_module_function (err -2)
+```
 
 ## Insert modules with the correct order
 ```
@@ -117,14 +116,86 @@ $ sudo insmod ./ex05_using_symbols.ko
 ```
 ```
 $ lsmod
-```
 Module                  Size  Used by
 ex05_using_symbols     49152  0
 ex05_exporting_symbols    49152  1 ex05_using_symbols
+```
+```
 $ sudo dmesg
-
 [ 2525.396077] Inside the ex05_simple_module_init function     // in ex05_exporting_symbols
-
 [ 2530.299534] Inside the ex05_simple_module_init function     // in ex05_using_symbols
-
 [ 2530.304797] Inside the ex05_simple_module_function function // in ex05_using_symbols
+```
+
+
+# Module Parameters
+Insert module with default parameter value
+```
+$ sudo insmod ./ex06_module_param.ko
+```
+```
+$ journalctl -k -f
+Dec 01 11:57:18 raspberrypi kernel: Inside the ex06_simple_module_init function
+Dec 01 11:57:18 raspberrypi kernel: Hello world: index = 0
+```
+
+Insert module with parameter value
+```
+$ sudo insmod ./ex06_module_param.ko count=5
+```
+```
+$ journalctl -k -f
+Dec 01 11:59:42 raspberrypi kernel: Inside the ex06_simple_module_init function
+Dec 01 11:59:42 raspberrypi kernel: Hello world: index = 0
+Dec 01 11:59:42 raspberrypi kernel: Hello world: index = 1
+Dec 01 11:59:42 raspberrypi kernel: Hello world: index = 2
+Dec 01 11:59:42 raspberrypi kernel: Hello world: index = 3
+Dec 01 11:59:42 raspberrypi kernel: Hello world: index = 4
+```
+
+## No sysfs entry
+module_param(name, type, perm); 
+perm sets to 0
+
+## Otherwise, /sys/module with giving permission
+module_param(name, type, perm);
+perm sets to : 
+- S_IRUGO : 0444, read-only (read for user/group/other)
+- S_IWUSR : 0200, owner write
+- S_IRUGO|S_IWUSR, 0644, owner can write, every can read
+
+Insert module with default value
+```
+$ sudo insmod ./ex06_module_param.ko
+```
+```
+$ journalctl -k -f
+Dec 01 12:08:56 raspberrypi kernel: Inside the ex06_simple_module_init function
+Dec 01 12:08:56 raspberrypi kernel: Hello world: index = 0
+```
+
+Check current module parameter value before modified
+```
+$ cat /sys/module/ex06_module_param/parameters/count 
+1
+```
+Modify module parameter value
+```
+$ echo 5 | sudo tee /sys/module/ex06_module_param/parameters/count 
+5
+$ cat /sys/module/ex06_module_param/parameters/count 
+5
+```
+Remove module
+```
+$ sudo rmmod ex06_module_param
+```
+```
+$ journalctl -k -f
+Dec 01 12:12:49 raspberrypi kernel: Inside the ex06_simple_module_exit function
+Dec 01 12:12:49 raspberrypi kernel: Goodbye world: index = 0
+Dec 01 12:12:49 raspberrypi kernel: Goodbye world: index = 1
+Dec 01 12:12:49 raspberrypi kernel: Goodbye world: index = 2
+Dec 01 12:12:49 raspberrypi kernel: Goodbye world: index = 3
+Dec 01 12:12:49 raspberrypi kernel: Goodbye world: index = 4
+```
