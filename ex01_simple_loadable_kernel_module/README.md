@@ -89,3 +89,42 @@ But for loadable module (.ko), kernel will not free the module .init section.
 So __init in the module still exist in the memory of module.
 
 ref : https://stackoverflow.com/questions/11680641/init-and-exit-macros-usage-for-built-in-and-loadable-modules
+
+# Export Symbol
+Symbol can be the addresses of global kernel items -- "functions" and "variables"
+
+Note : sysmobs to be exported cannot be expressed by static, and should be placed outside of any functions.
+
+Usage : 
+    EXPORT_SYMBOL(name);
+
+## If insmod a module that needs some symbols kernel don't has, you cannot  insert module
+```
+$ sudo insmod ./ex05_using_symbols.ko
+```
+insmod: ERROR: could not insert module ./ex05_using_symbols.ko: Unknown symbol in module
+```
+$ sudo dmesg
+```
+[ 1102.706836] ex05_using_symbols: loading out-of-tree module taints kernel.
+
+[ 1102.706895] ex05_using_symbols: Unknown symbol ex05_simple_module_function (err -2)
+
+## Insert modules with the correct order
+```
+$ sudo insmod ./ex05_exporting_symbols.ko
+$ sudo insmod ./ex05_using_symbols.ko
+```
+```
+$ lsmod
+```
+Module                  Size  Used by
+ex05_using_symbols     49152  0
+ex05_exporting_symbols    49152  1 ex05_using_symbols
+$ sudo dmesg
+
+[ 2525.396077] Inside the ex05_simple_module_init function     // in ex05_exporting_symbols
+
+[ 2530.299534] Inside the ex05_simple_module_init function     // in ex05_using_symbols
+
+[ 2530.304797] Inside the ex05_simple_module_function function // in ex05_using_symbols
