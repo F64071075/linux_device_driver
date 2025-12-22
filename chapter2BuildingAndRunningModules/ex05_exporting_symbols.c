@@ -3,7 +3,7 @@
 
 MODULE_LICENSE("GPL");
 
-// sysmobs to be exported cannot be expressed by static
+// sysbols to be exported cannot be expressed by static
 int ex05_simple_module_function(void)
 {
     printk(KERN_ALERT "Inside the %s function\n", __FUNCTION__);
